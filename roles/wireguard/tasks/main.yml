@@ -1,0 +1,10 @@
+---
+- name: Copy docker-compose.yml
+  copy:
+    src: files/docker-compose-wireguard.yml
+    dest: "{{ docker_compose_dir_wireguard }}/docker-compose.yml"
+
+- name: Deploy Docker Compose
+  command: docker-compose up -d
+  args:
+    chdir: "{{ docker_compose_dir_wireguard }}"

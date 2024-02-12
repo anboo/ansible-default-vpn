@@ -1,0 +1,7 @@
+- name: Deploy my project
+  hosts: all
+  become: yes
+  tasks:
+    - name: Include OpenVPN role
+      import_role:
+        name: openvpn

@@ -1,0 +1,17 @@
+- name: Deploy my project
+  hosts: all
+  become: yes
+  vars_files:
+    - group_vars/all.yml
+  tasks:
+    - name: Include Docker role
+      import_role:
+        name: docker
+
+    - name: Include WireGuard role
+      import_role:
+        name: wireguard
+
+    - name: Include OpenVPN role
+      import_role:
+        name: openvpn

@@ -1,0 +1,3 @@
+docker_compose_dir_openvpn: /var/www/openvpn
+docker_compose_dir_wireguard: /var/www/wireguard
+local_vpn_config_path: {{ ansible_env.PWD }}/v.ovpn

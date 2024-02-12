@@ -1,0 +1,38 @@
+---
+- name: Copy docker-compose.yml
+  copy:
+    src: files/docker-compose-openvpn.yml
+    dest: "{{ docker_compose_dir_openvpn }}/docker-compose.yml"
+
+- name: Deploy Docker Compose
+  command: docker-compose up -d
+  args:
+    chdir: "{{ docker_compose_dir_openvpn }}"
+
+- name: Generate OpenVPN config
+  command: docker-compose exec openvpn ovpn_genconfig -u udp://{{ ansible_host }}
+  args:
+    chdir: "{{ docker_compose_dir_openvpn }}"
+
+- name: Initialize OpenVPN PKI
+  command: docker-compose exec openvpn ovpn_initpki
+  args:
+    chdir: "{{ docker_compose_dir_openvpn }}"
+
+- name: Build OpenVPN client certificate
+  command: docker-compose exec openvpn easyrsa build-client-full vpn
+  args:
+    chdir: "{{ docker_compose_dir_openvpn }}"
+
+- name: Get OpenVPN client configuration
+  command: docker-compose exec openvpn ovpn_getclient vpn > /tmp/v.ovpn
+  args:
+    chdir: "{{ docker_compose_dir_openvpn }}"
+  register: vpn_config_result
+  failed_when: vpn_config_result.rc != 0
+
+- name: Copy v.ovpn from remote to local
+  fetch:
+    src: /tmp/v.ovpn
+    dest: "{{ local_vpn_config_path }}"
+  when: vpn_config_result|success
